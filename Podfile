@@ -6,5 +6,7 @@ target 'PrivacyPhoto.lib' do
   use_frameworks!
 
   pod 'SwiftyKeychainKit', '1.0.0-beta.2'
+  pod 'RxSwift', '~> 6.2'
+  pod 'RxCocoa', '~> 6.2'
 
 end

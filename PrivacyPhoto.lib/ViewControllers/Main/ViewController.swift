@@ -1,4 +1,6 @@
 import UIKit
+import RxSwift
+import RxCocoa
 
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -11,6 +13,9 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     private let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     private let manager = AppManager.shared
     private let const = Constants.MainVC.self
+    
+    private let dataSource = BehaviorRelay(value: AppManager.shared.getSavedImageData())
+    private let disposeBag = DisposeBag()
     
     private var isVCConfigured = false
     
@@ -28,19 +33,38 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        myCollectionView.reloadData()
+        dataSource.accept(AppManager.shared.getSavedImageData())
         shouldShowGalleryButton()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        myCollectionView.delegate = self
-        myCollectionView.dataSource = self
-        myCollectionView.register(UINib(nibName: "CollectionViewCell", bundle: nil), forCellWithReuseIdentifier: CollectionViewCell.identifier)
+    
         imagePickerButton.addTarget(self, action: #selector(showImagePickerAlert), for: .touchUpInside)
         homeButton.addTarget(self, action: #selector(homeButtonPressed), for: .touchUpInside)
         imageGalleryButton.addTarget(self, action: #selector(imageGalleryButtonPressed), for: .touchUpInside)
+        
+        myCollectionView.register(UINib(nibName: "CollectionViewCell", bundle: nil), forCellWithReuseIdentifier: CollectionViewCell.identifier)
+        
+        dataSource.bind(to: myCollectionView.rx.items(cellIdentifier: CollectionViewCell.identifier, cellType: CollectionViewCell.self)) { (row, element, cell) in
+            cell.configure(with: element)
+        }.disposed(by: disposeBag)
+        
+        myCollectionView
+            .rx
+            .setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        myCollectionView
+            .rx
+            .itemSelected
+            .subscribe { (indexPath) in
+                guard let index = indexPath.element else { return }
+                self.myCollectionView.deselectItem(at: index, animated: true)
+                
+                let photoLibVC = PhotoLibViewController(index: index.item)
+                self.navigationController?.pushViewController(photoLibVC, animated: true)
+            }.disposed(by: disposeBag)
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -134,7 +158,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                 manager.saveImageData(imageData)
             }
         }
-        myCollectionView.reloadData()
+        dataSource.accept(manager.getSavedImageData())
         shouldShowGalleryButton()
         picker.dismiss(animated: true, completion: nil)
     }
@@ -194,12 +218,5 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return const.lineSpacingForSection
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        
-        let photoLibVC = PhotoLibViewController(index: indexPath.item)
-        navigationController?.pushViewController(photoLibVC, animated: true)
     }
 }
