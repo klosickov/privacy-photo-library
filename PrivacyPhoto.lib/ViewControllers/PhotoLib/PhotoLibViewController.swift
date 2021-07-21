@@ -119,8 +119,6 @@ class PhotoLibViewController: UIViewController {
         backButton.leadingAnchor.constraint(equalTo: topButtonsContainerView.leadingAnchor).isActive = true
         backButton.centerYAnchor.constraint(equalTo: topButtonsContainerView.centerYAnchor).isActive = true
         
-        // likeButton settings
-        likeButton.setImage(UIImage(named: "like"), for: .selected)
         // likeButton constraints
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         likeButton.heightAnchor.constraint(equalTo: topButtonsContainerView.heightAnchor).isActive = true
@@ -235,7 +233,7 @@ class PhotoLibViewController: UIViewController {
         showAlert(title: nil, message: "This photo will be deleted from this app", style: .actionSheet, actionTitle: (first: "Delete Photo", second: "Cancel"), actionStyle: (first: .destructive, second: .cancel), actionHandler: (first: { (_) in
             
             self.manager.removeData(at: &self.index)
-            self.manager.setImage(to: self.imageView, at: self.index)
+            self.manager.showData(at: self.index, in: (self.secondImageView, self.commentTextField, self.likeButton))
         }, second: nil))
     }
     

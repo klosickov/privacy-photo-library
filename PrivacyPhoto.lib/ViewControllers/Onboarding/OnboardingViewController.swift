@@ -31,9 +31,6 @@ class OnboardingViewController: UIViewController {
         
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
-        //        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
-        //        UserDefaults.standard.synchronize()
-        
         if UserDefaults.wasAppLaunched() {
             displaySignInMessage()
         } else {

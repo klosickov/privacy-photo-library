@@ -157,8 +157,9 @@ class AppManager {
         case .like:
             dataObject.isFavorite = !dataObject.isFavorite
             if let button = views.1 {
-                button.isSelected = dataObject.isFavorite
-                if !button.isSelected {
+                if dataObject.isFavorite {
+                    button.setImage(UIImage(named: "like"), for: .normal)
+                } else {
                     button.setImage(UIImage(named: "dislike"), for: .normal)
                 }
             }
