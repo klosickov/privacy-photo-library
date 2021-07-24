@@ -17,7 +17,6 @@ class PhotoLibViewController: UIViewController {
     private let commentTextField = UITextField()
     private let manager = AppManager.shared
     private let const = Constants.PhotoLibVC.self
-    private let savedImageDataArray = AppManager.shared.getSavedImageData()
     
     private var bottomConstraint = NSLayoutConstraint()
     private var topConstraint = NSLayoutConstraint()
@@ -66,7 +65,7 @@ class PhotoLibViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if !savedImageDataArray.isEmpty {
+        if !manager.getSavedImageData().isEmpty {
             manager.showData(at: index, in: (secondImageView, commentTextField, likeButton))
         } else {
             imageView.image = UIImage(named: "photo_icon")
@@ -244,36 +243,36 @@ class PhotoLibViewController: UIViewController {
     }
     
     @IBAction private func previousButtonPressed() {
-        guard !savedImageDataArray.isEmpty else { return }
+        guard !manager.getSavedImageData().isEmpty else { return }
         
         disableViews()
         manager.decrement(&index)
-        imageView.image = manager.getUIImage(with: savedImageDataArray[index].imageName)
+        imageView.image = manager.getUIImage(with: manager.getSavedImageData()[index].imageName)
         
         UIView.animate(withDuration: 1.3) {
             self.secondImageView.frame.origin.x = self.view.frame.origin.x - self.secondImageView.frame.size.width
             self.manager.showData(at: self.index, in: (self.imageView, self.commentTextField, self.likeButton))
         } completion: { (_) in
-            self.secondImageView.image = self.manager.getUIImage(with: self.savedImageDataArray[self.index].imageName)
+            self.secondImageView.image = self.manager.getUIImage(with: self.manager.getSavedImageData()[self.index].imageName)
             self.secondImageView.frame.origin.x = self.imageView.frame.origin.x
             self.enableViews()
         }
     }
     
     @IBAction private func nextButtonPressed() {
-        guard !savedImageDataArray.isEmpty else { return }
+        guard !manager.getSavedImageData().isEmpty else { return }
         
         disableViews()
-        imageView.image = manager.getUIImage(with: savedImageDataArray[index].imageName)
+        imageView.image = manager.getUIImage(with: manager.getSavedImageData()[index].imageName)
         secondImageView.frame.origin.x = self.view.frame.width
         manager.increment(&index)
-        self.secondImageView.image = manager.getUIImage(with: savedImageDataArray[index].imageName)
+        self.secondImageView.image = manager.getUIImage(with: manager.getSavedImageData()[index].imageName)
         
         UIView.animate(withDuration: 1.3) {
             self.secondImageView.frame.origin.x = self.imageView.frame.origin.x
             self.manager.showData(at: self.index, in: (self.secondImageView, self.commentTextField, self.likeButton))
         } completion: { (_) in
-            self.imageView.image = self.manager.getUIImage(with: self.savedImageDataArray[self.index].imageName)
+            self.imageView.image = self.manager.getUIImage(with: self.manager.getSavedImageData()[self.index].imageName)
             self.enableViews()
         }
     }

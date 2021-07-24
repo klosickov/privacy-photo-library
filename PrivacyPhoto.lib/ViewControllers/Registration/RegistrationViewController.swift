@@ -27,6 +27,7 @@ class RegistrationViewController: UIViewController {
         if !isVCConfigured {
             configureViewController()
             isVCConfigured = true
+            
         }
     }
     
